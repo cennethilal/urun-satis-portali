@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css" />
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css" />
+<div class="container">
+    <h1 class="text-center">Ürünlerimiz </h1>
+    <hr />
+    <br />
+    <div id="divResult"></div>
+    <div class="row" id="urunListesi">
+        <!-- Dynamic content will be injected here -->
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+<script>
+    $(document).ready(function () {
+        listele();
+    });
+    var baseurl = "https://localhost:7110/";
+    var gettoken = localStorage.getItem("token");
+    function listele() {
+        $.ajax({
+            type: "GET",
+            url: baseurl + "api/Products/GetList",
+            contentType: "application/json",
+            headers: {
+                "Authorization": "Bearer " + gettoken
+            },
+            success: function (response) {
+                console.log(response);
+                var html = "";
+                $.each(response, function (index, item) {
+                    html += `
+                    <div class="col-md-4">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="slick-slider">
+                                <img src="${item.productSpecs.productImage1}" class="card-img-top" alt="${item.name}">
+
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">${item.name}</h5>
+                                <p class="card-text">${item.category.name}</p>
+                                <p class="card-text">Price: ${item.price}₺</p>
+                                <p class="card-text">Active: ${item.isActive ? 'Yes' : 'No'}</p>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                $("#urunListesi").html(html);
+
+                // Slick slider'ı etkinleştirme
+                $('.slick-slider').slick({
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    autoplay: true,
+                    autoplaySpeed: 2000,
+                    dots: true,
+                    arrows: false
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error("Error: " + status + " " + error);
+            }
+        });
+    }
+</script>
